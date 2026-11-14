@@ -1,0 +1,83 @@
+# FCVG101 Coursework - every path, size, seed and threshold lives here (rule R6).
+# Paths are relative to the project root.
+seed: 42
+
+paths:
+  calibration_images: data/calibration
+  samples: data/samples
+  raw_dataset: data/raw/flower_photos   # one sub-folder per class
+  splits: data/splits
+  artifacts: artifacts
+  results: results
+
+task1a:
+  pattern_cols: 6          # INNER corners horizontally (board of 7 x 10 squares)
+  pattern_rows: 9          # INNER corners vertically
+  square_size_mm: 9.1      # measured after printing
+  min_views: 3
+  fix_k3: false            # baseline; set true for the advanced variant
+  undistort_alpha: 0.0     # 0 = crop to valid pixels, 1 = keep all source pixels
+  undistort_sample: null   # photo for the before/after figure (same camera); null = first accepted view
+  synthetic_fallback:      # course pack's synthetic boards; the notebook uses them only while data/calibration is empty
+    folder: data/calibration_synthetic
+    pattern_cols: 9
+    pattern_rows: 6
+    square_size_mm: 18.0
+    true_K: [[900.0, 0.0, 480.0], [0.0, 890.0, 360.0], [0.0, 0.0, 1.0]]   # ground truth used to render them
+    true_dist: [-0.14, 0.04, 0.001, -0.0005, -0.005]
+
+task1b:
+  # Use your own photos: the Task 1B pack says its synthetic demo numbers must not go in the report.
+  sample_image: data/samples/clean.jpg          # one clean, sharp photo; noise is added in code
+  pair_image_1: data/samples/pair_1.jpg         # same scene, two views that overlap
+  pair_image_2: data/samples/pair_2.jpg
+  unrelated_image: data/samples/unrelated.jpg   # a different scene (negative control); skipped if missing
+  max_side_px: 960         # bigger photos are shrunk on load so FFT and figures stay fast
+  noise_tests:             # [1B.1] each one is filtered and scored
+    - {kind: gaussian, level: 20.0}       # std on the 0-255 scale
+    - {kind: salt_pepper, level: 0.05}    # fraction of pixels
+  kernel_size: 5           # [1B.2] box / Gaussian / median
+  gaussian_sigma: 1.2
+  filter_method: opencv    # opencv | scratch (advanced, own convolution)
+  fft_radius: 26           # [1B.3] cut-off, pixels from the spectrum centre
+  fft_radius_sweep: [15, 26, 40]
+  butterworth_order: 2
+  edge_blur_ksize: 5       # [1B.4]
+  edge_blur_sigma: 1.2
+  canny_low: 80
+  canny_high: 160
+  canny_sweep: [[40, 100], [80, 160], [120, 240]]
+  harris_k: 0.04           # [1B.5h]
+  harris_threshold: 0.035  # fraction of the max response
+  harris_max_corners: 80
+  detector: orb            # [1B.5] default for the app: orb | sift | harris
+  detectors_compare: [orb, sift, harris]
+  max_features: 1000
+  ratio_threshold: 0.75
+  use_ransac: true
+  ransac_threshold_px: 5.0
+  draw_max_matches: 40
+
+task2:
+  dataset_name: TensorFlow flowers (tf_flowers), 5 classes, CC-BY 2.0
+  dataset_url: https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz
+  min_side: 64             # [2.2] drop images smaller than this (px)
+  max_aspect: 3.0          # [2.2] drop panoramas / strips (long side / short side)
+  dedup_distance: 4        # [2.2] dHash Hamming distance counted as a near-duplicate (0 = exact only)
+  split_ratios: [0.70, 0.15, 0.15]
+  batch_size: 32
+  num_workers: 0           # DataLoader workers; >0 is faster on Linux, keep 0 in Windows notebooks
+  device: auto             # [2.5d] auto = GPU if available (Colab), else CPU; latency is always measured on CPU
+  weight_decay: 0.0001
+  label_smoothing: 0.1
+  tune_epochs: 5           # [2.6t] short budget per tuning trial
+  experiments:             # [2.5]-[2.7] run in order; the best on VALIDATION macro F1 is saved for Task 3
+    # baseline: small CNN from scratch, no augmentation (shows what augmentation adds)
+    - {name: cnn_no_aug, model_name: small_cnn, image_size: 112, augment: false, epochs: 15, learning_rate: 0.001}
+    # same CNN + augmentation; learning rate chosen by a small grid search on validation
+    - {name: cnn_aug, model_name: small_cnn, image_size: 112, augment: true, epochs: 15, learning_rate: 0.001,
+       tune: {learning_rate: [0.003, 0.001, 0.0003]}}
+    # transfer learning: ImageNet MobileNetV3, head first (backbone frozen), then fine-tune; fine-tune LR tuned
+    - {name: mobilenet_transfer, model_name: mobilenet_v3, image_size: 160, augment: true, epochs: 8,
+       freeze_epochs: 2, learning_rate: 0.001, fine_tune_lr: 0.0003,
+       tune: {fine_tune_lr: [0.001, 0.0003, 0.0001]}}

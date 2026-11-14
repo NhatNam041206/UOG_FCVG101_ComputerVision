@@ -1,0 +1,9 @@
+﻿noise,method,mse,psnr_db
+gaussian (std 20),noisy,396.108,22.153
+gaussian (std 20),box,62.904,30.144
+gaussian (std 20),gaussian,51.718,30.994
+gaussian (std 20),median,68.446,29.777
+salt_pepper (5%),noisy,900.247,18.587
+salt_pepper (5%),box,87.985,28.687
+salt_pepper (5%),gaussian,88.282,28.672
+salt_pepper (5%),median,41.923,31.906

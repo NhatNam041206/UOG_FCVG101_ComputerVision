@@ -1,0 +1,187 @@
+{
+  "inputs": {
+    "sample_image": [
+      640,
+      960,
+      3
+    ],
+    "pair_image_1": [
+      539,
+      960,
+      3
+    ],
+    "pair_image_2": [
+      485,
+      960,
+      3
+    ],
+    "unrelated_image": [
+      768,
+      600,
+      3
+    ]
+  },
+  "settings": {
+    "kernel_size": 5,
+    "gaussian_sigma": 1.2,
+    "filter_method": "opencv",
+    "fft_radius": 26,
+    "canny": [
+      80,
+      160
+    ],
+    "ratio_threshold": 0.75,
+    "use_ransac": true,
+    "ransac_threshold_px": 5.0,
+    "seed": 42
+  },
+  "filter_scores": {
+    "gaussian (std 20)": {
+      "noisy": {
+        "mse": 396.10802083333334,
+        "psnr_db": 22.15266724299546
+      },
+      "box": {
+        "mse": 62.903577473958336,
+        "psnr_db": 30.144050153746637
+      },
+      "gaussian": {
+        "mse": 51.71800130208333,
+        "psnr_db": 30.99438628113708
+      },
+      "median": {
+        "mse": 68.44560709635417,
+        "psnr_db": 29.77734780933099
+      }
+    },
+    "salt_pepper (5%)": {
+      "noisy": {
+        "mse": 900.247490234375,
+        "psnr_db": 18.587184415759133
+      },
+      "box": {
+        "mse": 87.98480631510417,
+        "psnr_db": 28.686726785269713
+      },
+      "gaussian": {
+        "mse": 88.28228841145834,
+        "psnr_db": 28.672067786575454
+      },
+      "median": {
+        "mse": 41.9226318359375,
+        "psnr_db": 31.90631821721759
+      }
+    }
+  },
+  "filter_scratch_vs_opencv_max_abs_diff": {
+    "box": 0,
+    "gaussian": 1
+  },
+  "edge_stats": [
+    {
+      "variant": "fixed (40, 100)",
+      "low": 40,
+      "high": 100,
+      "edge_density": 0.0359
+    },
+    {
+      "variant": "fixed (80, 160)",
+      "low": 80,
+      "high": 160,
+      "edge_density": 0.0173
+    },
+    {
+      "variant": "fixed (120, 240)",
+      "low": 120,
+      "high": 240,
+      "edge_density": 0.007
+    },
+    {
+      "variant": "auto (median)",
+      "low": 75,
+      "high": 148,
+      "edge_density": 0.0195
+    }
+  ],
+  "harris_corners": {
+    "opencv": 80,
+    "scratch": 80
+  },
+  "matching": [
+    {
+      "pair": "same_scene",
+      "detector": "orb",
+      "keypoints_1": 1000,
+      "keypoints_2": 1000,
+      "good_matches": 353,
+      "ransac_inliers": 335,
+      "inlier_ratio": 0.949,
+      "time_ms": 42.9
+    },
+    {
+      "pair": "same_scene",
+      "detector": "sift",
+      "keypoints_1": 1001,
+      "keypoints_2": 1000,
+      "good_matches": 501,
+      "ransac_inliers": 487,
+      "inlier_ratio": 0.972,
+      "time_ms": 208.6
+    },
+    {
+      "pair": "same_scene",
+      "detector": "harris",
+      "keypoints_1": 903,
+      "keypoints_2": 873,
+      "good_matches": 483,
+      "ransac_inliers": 473,
+      "inlier_ratio": 0.979,
+      "time_ms": 37.8
+    },
+    {
+      "pair": "unrelated",
+      "detector": "orb",
+      "keypoints_1": 1000,
+      "keypoints_2": 1000,
+      "good_matches": 4,
+      "ransac_inliers": 4,
+      "inlier_ratio": 1.0,
+      "time_ms": 47.8
+    },
+    {
+      "pair": "unrelated",
+      "detector": "sift",
+      "keypoints_1": 1001,
+      "keypoints_2": 1000,
+      "good_matches": 9,
+      "ransac_inliers": 4,
+      "inlier_ratio": 0.444,
+      "time_ms": 252.5
+    },
+    {
+      "pair": "unrelated",
+      "detector": "harris",
+      "keypoints_1": 903,
+      "keypoints_2": 958,
+      "good_matches": 3,
+      "ransac_inliers": 0,
+      "inlier_ratio": 0.0,
+      "time_ms": 37.3
+    }
+  ],
+  "figures": [
+    "01_filter_comparison.png",
+    "01b_filter_psnr.png",
+    "02_frequency_domain.png",
+    "02b_fft_radius_sweep.png",
+    "03_edges.png",
+    "03b_canny_sweep.png",
+    "04_harris.png",
+    "05_matches_same_scene_orb.png",
+    "05_matches_same_scene_sift.png",
+    "05_matches_same_scene_harris.png",
+    "05_matches_unrelated_orb.png",
+    "05_matches_unrelated_sift.png",
+    "05_matches_unrelated_harris.png"
+  ]
+}

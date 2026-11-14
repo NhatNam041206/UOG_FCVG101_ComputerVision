@@ -1,0 +1,17 @@
+﻿file_name,mean_reprojection_error_px,rms_reprojection_error_px
+synthetic_view_01.jpg,0.07189,0.07662
+synthetic_view_02.jpg,0.0324,0.03645
+synthetic_view_03.jpg,0.04738,0.0522
+synthetic_view_04.jpg,0.1813,0.1968
+synthetic_view_05.jpg,0.08103,0.08796
+synthetic_view_06.jpg,0.03843,0.04273
+synthetic_view_07.jpg,0.02602,0.03063
+synthetic_view_08.jpg,0.03276,0.0373
+synthetic_view_09.jpg,0.02694,0.03146
+synthetic_view_10.jpg,0.04415,0.05865
+synthetic_view_11.jpg,0.02289,0.02541
+synthetic_view_12.jpg,0.08726,0.09325
+synthetic_view_13.jpg,0.06742,0.07818
+synthetic_view_14.jpg,0.0173,0.02044
+synthetic_view_15.jpg,0.02574,0.02931
+synthetic_view_16.jpg,0.0334,0.03973

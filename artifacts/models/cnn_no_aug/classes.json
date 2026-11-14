@@ -1,0 +1,11 @@
+{
+  "classes": [
+    "daisy",
+    "dandelion",
+    "roses",
+    "sunflowers",
+    "tulips"
+  ],
+  "model_name": "small_cnn",
+  "image_size": 112
+}
