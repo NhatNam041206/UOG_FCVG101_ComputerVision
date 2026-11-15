@@ -116,7 +116,7 @@
       "good_matches": 353,
       "ransac_inliers": 335,
       "inlier_ratio": 0.949,
-      "time_ms": 42.9
+      "time_ms": 63.8
     },
     {
       "pair": "same_scene",
@@ -126,7 +126,7 @@
       "good_matches": 501,
       "ransac_inliers": 487,
       "inlier_ratio": 0.972,
-      "time_ms": 208.6
+      "time_ms": 220.6
     },
     {
       "pair": "same_scene",
@@ -136,7 +136,7 @@
       "good_matches": 483,
       "ransac_inliers": 473,
       "inlier_ratio": 0.979,
-      "time_ms": 37.8
+      "time_ms": 31.9
     },
     {
       "pair": "unrelated",
@@ -146,7 +146,7 @@
       "good_matches": 4,
       "ransac_inliers": 4,
       "inlier_ratio": 1.0,
-      "time_ms": 47.8
+      "time_ms": 45.1
     },
     {
       "pair": "unrelated",
@@ -156,7 +156,7 @@
       "good_matches": 9,
       "ransac_inliers": 4,
       "inlier_ratio": 0.444,
-      "time_ms": 252.5
+      "time_ms": 232.2
     },
     {
       "pair": "unrelated",
@@ -166,7 +166,7 @@
       "good_matches": 3,
       "ransac_inliers": 0,
       "inlier_ratio": 0.0,
-      "time_ms": 37.3
+      "time_ms": 30.2
     }
   ],
   "figures": [

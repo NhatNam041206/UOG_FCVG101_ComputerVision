@@ -1,7 +1,7 @@
 ﻿pair,detector,keypoints_1,keypoints_2,good_matches,ransac_inliers,inlier_ratio,time_ms
-same_scene,orb,1000,1000,353,335,0.949,42.9
-same_scene,sift,1001,1000,501,487,0.972,208.6
-same_scene,harris,903,873,483,473,0.979,37.8
-unrelated,orb,1000,1000,4,4,1.0,47.8
-unrelated,sift,1001,1000,9,4,0.444,252.5
-unrelated,harris,903,958,3,0,0.0,37.3
+same_scene,orb,1000,1000,353,335,0.949,63.8
+same_scene,sift,1001,1000,501,487,0.972,220.6
+same_scene,harris,903,873,483,473,0.979,31.9
+unrelated,orb,1000,1000,4,4,1.0,45.1
+unrelated,sift,1001,1000,9,4,0.444,232.2
+unrelated,harris,903,958,3,0,0.0,30.2
