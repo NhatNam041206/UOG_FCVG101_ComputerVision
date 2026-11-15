@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Task 2 dataset: downloaded to data/raw/ on the first run of run_task2 (about 230 MB)
+data/raw/*
+!data/raw/.gitkeep
+
+# Per-session captures from the live camera / app upload (configs/config.yaml)
+data/calibration_live/
+data/calibration_uploads/
+
+# Large regenerated cache (run_task2 rebuilds it)
+results/task2/features_cache.npz
+
+# Report build intermediates and the old archived draft (python report/build_report.py rebuilds build/)
+report/build/
+report/archive_*/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
