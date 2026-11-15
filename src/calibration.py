@@ -1,6 +1,7 @@
 """[1A] Task 1A - camera calibration and undistortion (rubric 1.1).
 
-Flow:  run_task1a(cfg)
+Flow:  run_task1a(cfg, source)
+         -> [1A.0] collect_calibration_images  (source "upload" = photo files, "camera" = live capture tool)
          -> [1A.1] load_calibration_images
          -> [1A.2a] make_board_points
          -> [1A.2] detect_corners            (per image)
@@ -13,6 +14,9 @@ Baseline: OpenCV 5-coefficient model. Advanced: fix_k3=True (k3 held at 0 to sto
 The course originals in Cousework/ stay unchanged; this module mirrors calibration_task1a.py as functions
 (same detector order, same error definitions, same npz keys).
 """
+import subprocess
+import sys
+import time
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -25,6 +29,7 @@ from src.io_utils import list_images, read_image, save_csv, save_image, save_jso
 from src.visualize import plot_view_errors
 
 MIN_VIEWS = 3
+SOURCES = ("upload", "camera")   # [1A.0] the two ways to get calibration photos
 
 
 @dataclass
@@ -49,6 +54,70 @@ class Task1AReport:
     variants: dict = field(default_factory=dict)    # "baseline" / "fix_k3" -> summary numbers
     figure_paths: list = field(default_factory=list)
     metrics_path: object = None
+
+
+def _tool_path(cfg, key):
+    """Absolute path of one of nam's Task 1A tools in tools/task1a (run unchanged, never re-implemented)."""
+    path = cfg.project_root / getattr(cfg.task1a, key)
+    if not path.is_file():
+        raise FileNotFoundError(f"[1A.0] {path} not found; keep capture_checker_task1a.py, undistort_view_task1a.py "
+                                f"and calibration_task1a.py together in tools/task1a/")
+    return path
+
+
+def _new_session_folder(cfg, key):
+    """data/calibration_<live|uploads>/session_YYYYmmdd_HHMMSS, so sessions are never mixed."""
+    folder = cfg.project_root / getattr(cfg.task1a, key) / time.strftime("session_%Y%m%d_%H%M%S")
+    folder.mkdir(parents=True, exist_ok=False)
+    return folder
+
+
+def collect_calibration_images(cfg, source=None, uploads=None):
+    """[1A.0] Get the checkerboard photos from one of two sources and return the folder that holds them.
+
+    Purpose:  Let the user either upload photos or take them live from the camera (one camera, one resolution).
+    Flow:     called by run_task1a() (and the app)  ->  next step: [1A.1] load_calibration_images
+    Method:   "upload": uploads given -> written to a new data/calibration_uploads/session_* folder;
+                        no uploads -> the photos already in paths.calibration_images are used.
+              "camera": runs tools/task1a/capture_checker_task1a.py --camera (nam's guided capture tool,
+                        unchanged) into a new data/calibration_live/session_* folder; its window guides the
+                        13-shot plan and closes when done (Q quits early).
+
+    Inputs:
+        cfg:     config from load_config() (uses cfg.task1a.source, camera_index, screen_board, tool paths).
+        source:  "upload" | "camera"; None = cfg.task1a.source.
+        uploads: optional list of (file_name: str, data: bytes), e.g. from st.file_uploader(accept_multiple_files).
+
+    Returns:
+        Path of the folder with the photos.
+
+    Raises:
+        ValueError: unknown source.
+        FileNotFoundError: capture tool missing, or no photos were saved.
+        subprocess.CalledProcessError: the capture tool failed (camera not found, ...).
+    """
+    settings = cfg.task1a
+    source = source or settings.source
+    if source not in SOURCES:
+        raise ValueError(f"[1A.0] source must be one of {SOURCES}, got {source!r}")
+    if source == "upload":
+        if not uploads:
+            return cfg.paths.calibration_images
+        folder = _new_session_folder(cfg, "upload_save_root")
+        for name, data in uploads:
+            (folder / Path(name).name).write_bytes(data)
+        return folder
+    folder = _new_session_folder(cfg, "live_save_root")
+    command = [sys.executable, str(_tool_path(cfg, "capture_tool")), "--camera", str(settings.camera_index),
+               "--save-dir", str(folder), "--output", str(cfg.paths.results / "task1a" / "capture"),
+               "--cols", str(settings.pattern_cols), "--rows", str(settings.pattern_rows),
+               "--square-mm", str(settings.square_size_mm), "--force"]
+    if settings.screen_board:
+        command.append("--screen")
+    subprocess.run(command, check=True, cwd=cfg.project_root)
+    if not list_images(folder):
+        raise FileNotFoundError(f"[1A.0] the capture tool saved no photos in {folder}")
+    return folder
 
 
 def load_calibration_images(folder):
@@ -276,18 +345,20 @@ def _summarise(result, per_view, mean_px):
             "k1": float(k1), "k2": float(k2), "p1": float(p1), "p2": float(p2), "k3": float(k3)}
 
 
-def run_task1a(cfg):
+def run_task1a(cfg, source=None, uploads=None):
     """[1A.R] Run the whole Task 1A flow and save its results.
 
     Purpose:  One call that produces every Task 1A number and figure for the report.
     Flow:     called by notebook / README command
-              -> [1A.1] -> [1A.2a] -> [1A.2] -> [1A.3] (baseline + fix_k3) -> [1A.4] -> [1A.5] -> [1A.6]
+              -> [1A.0] -> [1A.1] -> [1A.2a] -> [1A.2] -> [1A.3] (baseline + fix_k3) -> [1A.4] -> [1A.5] -> [1A.6]
               writes results/task1a/ (corners/ overlays, detection_log.csv, view_errors.csv,
               calibration_variants.csv, view_errors.png, before_after.jpg, metrics.json)
               and artifacts/calibration.npz (the variant chosen by cfg.task1a.fix_k3)
 
     Inputs:
-        cfg: config from load_config() (uses cfg.paths, cfg.task1a, cfg.seed).
+        cfg:     config from load_config() (uses cfg.paths, cfg.task1a, cfg.seed).
+        source:  "upload" | "camera"; None = cfg.task1a.source (see [1A.0]).
+        uploads: optional list of (file_name, bytes) for source "upload".
 
     Returns:
         Task1AReport.
@@ -297,7 +368,8 @@ def run_task1a(cfg):
     out_dir = cfg.paths.results / "task1a"
     pattern_size = (settings.pattern_cols, settings.pattern_rows)
 
-    images = load_calibration_images(cfg.paths.calibration_images)                       # [1A.1]
+    folder = collect_calibration_images(cfg, source, uploads)                             # [1A.0]
+    images = load_calibration_images(folder)                                             # [1A.1]
     board = make_board_points(pattern_size, settings.square_size_mm / 1000.0)            # [1A.2a]
     object_points, image_points, accepted, rejected, log_rows = [], [], [], [], []
     for name, bgr in images:                                                             # [1A.2]
@@ -348,7 +420,7 @@ def run_task1a(cfg):
     save_csv([{"variant": label, **numbers} for label, numbers in variants.items()],
              out_dir / "calibration_variants.csv")
     metrics_path = save_json({
-        "input_folder": str(cfg.paths.calibration_images), "accepted": len(accepted), "total": len(images),
+        "input_folder": folder.relative_to(cfg.project_root).as_posix() if folder.is_relative_to(cfg.project_root) else str(folder), "accepted": len(accepted), "total": len(images),
         "pattern_inner_corners": list(pattern_size), "square_size_mm": settings.square_size_mm,
         "image_size_wh": list(image_size), "chosen_variant": "fix_k3" if settings.fix_k3 else "baseline",
         "K": chosen.K, "dist": chosen.dist.ravel(), "rms_px": chosen.rms_px, "mean_error_px": mean_px,
@@ -357,3 +429,51 @@ def run_task1a(cfg):
     return Task1AReport(calibration=chosen, accepted=accepted, rejected=rejected, view_errors=view_errors,
                         mean_error_px=mean_px, variants=variants, figure_paths=figure_paths,
                         metrics_path=metrics_path)
+
+
+def view_undistorted(cfg, source="camera", image_path=None):
+    """[1A.7] Live BEFORE | AFTER window with nam's undistort_view_task1a.py (run unchanged).
+
+    Purpose:  Show the saved calibration working on the camera feed or on one photo.
+    Flow:     called by the CLI below (or the app)  ->  runs tools/task1a/undistort_view_task1a.py
+              with artifacts/calibration.npz; keys in the window: G grid, A crop, S snapshot, Q quit.
+
+    Inputs:
+        cfg:        config from load_config().
+        source:     "camera" (live, cfg.task1a.camera_index) or "upload" (one photo file).
+        image_path: photo for source "upload".
+
+    Returns:
+        None (snapshots go to results/task1a/undistort_live/).
+
+    Raises:
+        ValueError: unknown source, or "upload" without image_path.
+        FileNotFoundError: calibration.npz or the tool is missing.
+    """
+    calib = cfg.paths.artifacts / "calibration.npz"
+    if not calib.is_file():
+        raise FileNotFoundError(f"[1A.7] {calib} not found: run Task 1A (run_task1a) first")
+    if source not in SOURCES or (source == "upload" and not image_path):
+        raise ValueError(f"[1A.7] source must be 'camera', or 'upload' with image_path; got {source!r}")
+    command = [sys.executable, str(_tool_path(cfg, "undistort_tool")), "--calib", str(calib),
+               "--output", str(cfg.paths.results / "task1a" / "undistort_live")]
+    command += ["--camera", str(cfg.task1a.camera_index)] if source == "camera" else ["--image", str(image_path)]
+    subprocess.run(command, check=True, cwd=cfg.project_root)
+
+
+if __name__ == "__main__":
+    # python -m src.calibration --source upload|camera [--view]
+    import argparse
+
+    from src.config import load_config
+
+    parser = argparse.ArgumentParser(description="[1A.R] Task 1A: calibrate from uploaded photos or the live camera")
+    parser.add_argument("--source", choices=SOURCES, help="default: task1a.source in configs/config.yaml")
+    parser.add_argument("--view", action="store_true", help="open the live BEFORE | AFTER undistort window afterwards")
+    args = parser.parse_args()
+    config = load_config()
+    report = run_task1a(config, source=args.source)
+    print(f"{len(report.accepted)} views used, {len(report.rejected)} rejected, RMS {report.calibration.rms_px:.3f} px, "
+          f"mean error {report.mean_error_px:.3f} px -> artifacts/calibration.npz, results/task1a/")
+    if args.view:
+        view_undistorted(config, "camera")

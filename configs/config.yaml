@@ -11,9 +11,17 @@ paths:
   results: results
 
 task1a:
+  source: upload           # [1A.0] upload = photo files (data/calibration, or files uploaded in the app)
+                           #        camera = live guided capture with tools/task1a/capture_checker_task1a.py
+  camera_index: 0          # webcam used by "camera" (capture + live undistort viewer)
+  screen_board: true       # board is shown on a phone/tablet screen (capture tool --screen)
+  capture_tool: tools/task1a/capture_checker_task1a.py   # nam's tools, run unchanged
+  undistort_tool: tools/task1a/undistort_view_task1a.py
+  live_save_root: data/calibration_live         # each live session -> new session_* sub-folder
+  upload_save_root: data/calibration_uploads    # each app upload -> new session_* sub-folder
   pattern_cols: 6          # INNER corners horizontally (board of 7 x 10 squares)
   pattern_rows: 9          # INNER corners vertically
-  square_size_mm: 9.1      # measured after printing
+  square_size_mm: 9.1      # measured with a ruler on the board as displayed (phone screen); scales extrinsics only
   min_views: 3
   fix_k3: false            # baseline; set true for the advanced variant
   undistort_alpha: 0.0     # 0 = crop to valid pixels, 1 = keep all source pixels

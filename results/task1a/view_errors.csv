@@ -1,0 +1,14 @@
+﻿file_name,mean_reprojection_error_px,rms_reprojection_error_px
+view_01.png,0.09204,0.10706
+view_02.png,0.0983,0.1091
+view_03.png,0.08916,0.10701
+view_04.png,0.08936,0.1052
+view_05.png,0.07105,0.0896
+view_06.png,0.07966,0.08989
+view_07.png,0.0703,0.07916
+view_08.png,0.07873,0.0879
+view_09.png,0.08869,0.12724
+view_10.png,0.07802,0.09088
+view_11.png,0.05765,0.06394
+view_12.png,0.08992,0.10537
+view_13.png,0.07228,0.08238

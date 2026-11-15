@@ -86,3 +86,17 @@ def test_undistort_shape_and_size_check():
 def test_missing_calibration_file(tmp_path):
     with pytest.raises(FileNotFoundError):
         load_calibration(tmp_path / "nope.npz")
+
+
+def test_collect_calibration_images_sources(tmp_path):
+    """[1A.0] upload with files -> new session folder; upload without files -> config folder; bad source -> error."""
+    from src.calibration import collect_calibration_images
+    from src.config import load_config
+    cfg = load_config()
+    cfg.project_root = tmp_path
+    cfg.task1a.upload_save_root = "uploads"
+    folder = collect_calibration_images(cfg, "upload", [("a.png", b"x"), ("b.png", b"y")])
+    assert folder.parent == tmp_path / "uploads" and sorted(p.name for p in folder.iterdir()) == ["a.png", "b.png"]
+    assert collect_calibration_images(cfg, "upload") == cfg.paths.calibration_images
+    with pytest.raises(ValueError):
+        collect_calibration_images(cfg, "webcam")
