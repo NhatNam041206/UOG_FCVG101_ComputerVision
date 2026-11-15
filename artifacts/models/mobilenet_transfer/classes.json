@@ -1,0 +1,11 @@
+{
+  "classes": [
+    "daisy",
+    "dandelion",
+    "roses",
+    "sunflowers",
+    "tulips"
+  ],
+  "model_name": "mobilenet_v3",
+  "image_size": 160
+}

@@ -19,6 +19,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pandas as pd
+from PIL import Image
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -151,6 +152,47 @@ def extract_deep_features(paths, image_size=160, batch_size=64):
             batch = torch.stack([transform(load_rgb(p)) for p in paths[start:start + batch_size]])
             features.append(model(batch).numpy())
     return np.concatenate(features).astype(np.float32)
+
+
+def measure_feature_latency(paths, image_size=160, repeats=50):
+    """[2.9e] Time to turn ONE image already in memory into a feature vector (median, milliseconds).
+
+    Purpose:  Fair speed comparison with the CNNs: benchmark_model [2.7b] times the network on an image already in
+              memory, so disk reading is excluded here too. A baseline's latency = feature time + classifier time.
+    Flow:     called by run_baselines()
+
+    Inputs:
+        paths:      image paths (the first `repeats` are used).
+        image_size: input size of the frozen MobileNetV3.
+        repeats:    images timed.
+
+    Returns:
+        dict "handcrafted" and "deep_frozen" -> median ms per image.
+    """
+    import torch
+
+    from src.data_pipeline import make_transforms
+    from src.io_utils import read_image
+    from src.model import build_model
+
+    images = [read_image(p) for p in paths[:repeats]]
+    hand = []
+    for bgr in images:
+        started = time.perf_counter()
+        extract_handcrafted_features(bgr)
+        hand.append(time.perf_counter() - started)
+    model = build_model("mobilenet_v3", 1000).eval()
+    model.reset_classifier(0)
+    transform = make_transforms(image_size, train=False)
+    tensors = [transform(Image.fromarray(cv2.cvtColor(bgr, cv2.COLOR_BGR2RGB))).unsqueeze(0) for bgr in images]
+    deep = []
+    with torch.no_grad():
+        model(tensors[0])                                   # warm-up
+        for tensor in tensors:
+            started = time.perf_counter()
+            model(tensor)
+            deep.append(time.perf_counter() - started)
+    return {"handcrafted": round(1000 * float(np.median(hand)), 2), "deep_frozen": round(1000 * float(np.median(deep)), 2)}
 
 
 # ----------------------------------------------------------------------------------------------------------- [2.9c]
@@ -302,12 +344,13 @@ def run_baselines(cfg):
     cut = np.cumsum(sizes)[:-1]
     labels = np.array([classes.index(l) for name in ("train", "val", "test") for l in splits[name].label])
     y_train, y_val, y_test = np.split(labels, cut)
-    feature_sets = {"hand-crafted (colour+HOG+LBP)": (handcrafted, hand_seconds),
-                    "ImageNet MobileNetV3 features (frozen)": (deep, deep_seconds)}
+    latency = measure_feature_latency([resolve(p) for p in splits["test"].path])                 # [2.9e]
+    feature_sets = {"hand-crafted (colour+HOG+LBP)": (handcrafted, latency["handcrafted"]),
+                    "ImageNet MobileNetV3 features (frozen)": (deep, latency["deep_frozen"])}
     rows, results = [], {}
     for name in BASELINE_GRIDS:
         sets = list(feature_sets.items())[:1] if "dummy" in name else feature_sets.items()
-        for features_name, (matrix, seconds) in sets:
+        for features_name, (matrix, feature_ms) in sets:
             if "ImageNet" in features_name and name not in ("logistic regression", "SVM (RBF kernel)"):
                 continue                                  # a linear/kernel probe is the standard test for embeddings
             x_train, x_val, x_test = np.split(matrix, cut)
@@ -317,7 +360,7 @@ def run_baselines(cfg):
                          "chosen_params": str(result.params), "val_macro_f1": round(result.val_macro_f1, 4),
                          "test_accuracy": round(result.test_accuracy, 4), "test_macro_f1": round(result.test_macro_f1, 4),
                          "fit_seconds": result.fit_seconds,
-                         "latency_ms": round(result.predict_ms_per_image + (0 if "dummy" in name else 1000 * seconds), 2),
+                         "latency_ms": round(result.predict_ms_per_image + (0 if "dummy" in name else feature_ms), 2),
                          "size_MB": result.size_MB})
     hand_rows = {key: r for key, r in results.items() if key[1].startswith("hand") and "dummy" not in key[0]}
     best_key = max(hand_rows, key=lambda key: hand_rows[key].val_macro_f1)
@@ -325,6 +368,7 @@ def run_baselines(cfg):
     importance = group_permutation_importance(results[best_key].model, x_val, y_val, handcrafted_feature_groups())
     save_csv(rows, out_dir / "baselines.csv")
     summary = {"rows": rows, "importance_model": best_key[0], "importance": importance,
-               "feature_seconds_per_image": {"handcrafted": hand_seconds, "deep_frozen": deep_seconds}}
+               "feature_latency_ms": latency,
+               "feature_seconds_per_image": {"handcrafted": hand_seconds, "deep_frozen": deep_seconds}}   # incl. disk
     save_json(summary, out_dir / "baselines.json")
     return summary

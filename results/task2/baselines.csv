@@ -1,0 +1,9 @@
+﻿model,features,chosen_params,val_macro_f1,test_accuracy,test_macro_f1,fit_seconds,latency_ms,size_MB
+majority class (dummy),none (ignores the image),{},0.0787,0.2445,0.0786,0.02,0.0,0.0
+random by class share (dummy),none (ignores the image),{},0.2124,0.1825,0.1742,0.0,0.0,0.0
+k-NN,hand-crafted (colour+HOG+LBP),{'n_neighbors': 5},0.434,0.4599,0.4063,0.42,3.65,22.25
+logistic regression,hand-crafted (colour+HOG+LBP),{'C': 0.01},0.6475,0.6624,0.6585,7.97,3.49,0.1
+logistic regression,ImageNet MobileNetV3 features (frozen),{'C': 0.1},0.9325,0.9252,0.9241,1.99,17.69,0.05
+SVM (RBF kernel),hand-crafted (colour+HOG+LBP),{'C': 10.0},0.6973,0.6934,0.6908,18.43,11.5,42.09
+SVM (RBF kernel),ImageNet MobileNetV3 features (frozen),{'C': 10.0},0.9272,0.9161,0.9158,3.63,20.46,15.49
+random forest,hand-crafted (colour+HOG+LBP),{'max_features': 0.05},0.721,0.7062,0.7041,14.74,3.78,21.49

@@ -1,22 +1,22 @@
 ﻿path,label,reason
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/sunflowers/15030133005_9728102622_z.jpg,sunflowers,aspect ratio above 3.0
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/tulips/13555215723_cf2c11626b_b.jpg,tulips,aspect ratio above 3.0
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/tulips/6905876618_12732b74de_b.jpg,tulips,aspect ratio above 3.0
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/daisy/10993818044_4c19b86c82.jpg,daisy,duplicate of 10993710036_2033222c91.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/daisy/10994032453_ac7f8d9e2e.jpg,daisy,duplicate of 10466290366_cc72e33532.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/dandelion/18304194360_2a4a0be631_m.jpg,dandelion,duplicate of 17161833794_e1d92259d2_m.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/dandelion/284497233_c19801752c.jpg,dandelion,duplicate of 284497199_93a01f48f6.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/dandelion/4654848357_9549351e0b_n.jpg,dandelion,duplicate of 4278757393_bca8415ed4_n.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/dandelion/506660896_c903cca1f0.jpg,dandelion,duplicate of 506659320_6fac46551e.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/roses/13342823005_16d3df58df_n.jpg,roses,duplicate of 13279526615_a3b0059bec.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/roses/15922772266_1167a06620.jpg,roses,"duplicate with conflicting labels ['roses', 'tulips']"
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/roses/2093263381_afd51358a3.jpg,roses,duplicate of 1775233884_12ff5a124f.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/sunflowers/14741866338_bdc8bfc8d5_n.jpg,sunflowers,duplicate of 14925398301_55a180f919_n.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/sunflowers/15066430311_fb57fa92b0_m.jpg,sunflowers,duplicate of 14889392928_9742aed45b_m.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/sunflowers/15072973261_73e2912ef2_n.jpg,sunflowers,duplicate of 15069459615_7e0fd61914_n.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/sunflowers/22429946721_e17a12cb39_n.jpg,sunflowers,duplicate of 17433282043_441b0a07f4_n.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/sunflowers/2588453601_66f2a03cca_n.jpg,sunflowers,duplicate of 2588234269_c4bfd0d8b9_n.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/tulips/12916441224_2ed63596f8_n.jpg,tulips,duplicate of 12916135413_dafcf3089e_n.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/tulips/15922772266_1167a06620.jpg,tulips,"duplicate with conflicting labels ['roses', 'tulips']"
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/tulips/2344751399_71620039f2_n.jpg,tulips,duplicate of 2333321040_3960b9d67e_n.jpg
-/tmp/claude-0/-home-user/524f17cf-6533-5d42-a627-b1943abdbf96/scratchpad/t2/flower_photos/tulips/5700394524_dc6f8fa9cd_n.jpg,tulips,duplicate of 5635347336_bc1400e939_n.jpg
+data/raw/flower_photos/sunflowers/15030133005_9728102622_z.jpg,sunflowers,aspect ratio above 3.0
+data/raw/flower_photos/tulips/13555215723_cf2c11626b_b.jpg,tulips,aspect ratio above 3.0
+data/raw/flower_photos/tulips/6905876618_12732b74de_b.jpg,tulips,aspect ratio above 3.0
+data/raw/flower_photos/daisy/10993818044_4c19b86c82.jpg,daisy,duplicate of 10993710036_2033222c91.jpg
+data/raw/flower_photos/daisy/10994032453_ac7f8d9e2e.jpg,daisy,duplicate of 10466290366_cc72e33532.jpg
+data/raw/flower_photos/dandelion/18304194360_2a4a0be631_m.jpg,dandelion,duplicate of 17161833794_e1d92259d2_m.jpg
+data/raw/flower_photos/dandelion/284497233_c19801752c.jpg,dandelion,duplicate of 284497199_93a01f48f6.jpg
+data/raw/flower_photos/dandelion/4654848357_9549351e0b_n.jpg,dandelion,duplicate of 4278757393_bca8415ed4_n.jpg
+data/raw/flower_photos/dandelion/506660896_c903cca1f0.jpg,dandelion,duplicate of 506659320_6fac46551e.jpg
+data/raw/flower_photos/roses/13342823005_16d3df58df_n.jpg,roses,duplicate of 13279526615_a3b0059bec.jpg
+data/raw/flower_photos/roses/15922772266_1167a06620.jpg,roses,"duplicate with conflicting labels ['roses', 'tulips']"
+data/raw/flower_photos/roses/2093263381_afd51358a3.jpg,roses,duplicate of 1775233884_12ff5a124f.jpg
+data/raw/flower_photos/sunflowers/14741866338_bdc8bfc8d5_n.jpg,sunflowers,duplicate of 14925398301_55a180f919_n.jpg
+data/raw/flower_photos/sunflowers/15066430311_fb57fa92b0_m.jpg,sunflowers,duplicate of 14889392928_9742aed45b_m.jpg
+data/raw/flower_photos/sunflowers/15072973261_73e2912ef2_n.jpg,sunflowers,duplicate of 15069459615_7e0fd61914_n.jpg
+data/raw/flower_photos/sunflowers/22429946721_e17a12cb39_n.jpg,sunflowers,duplicate of 17433282043_441b0a07f4_n.jpg
+data/raw/flower_photos/sunflowers/2588453601_66f2a03cca_n.jpg,sunflowers,duplicate of 2588234269_c4bfd0d8b9_n.jpg
+data/raw/flower_photos/tulips/12916441224_2ed63596f8_n.jpg,tulips,duplicate of 12916135413_dafcf3089e_n.jpg
+data/raw/flower_photos/tulips/15922772266_1167a06620.jpg,tulips,"duplicate with conflicting labels ['roses', 'tulips']"
+data/raw/flower_photos/tulips/2344751399_71620039f2_n.jpg,tulips,duplicate of 2333321040_3960b9d67e_n.jpg
+data/raw/flower_photos/tulips/5700394524_dc6f8fa9cd_n.jpg,tulips,duplicate of 5635347336_bc1400e939_n.jpg

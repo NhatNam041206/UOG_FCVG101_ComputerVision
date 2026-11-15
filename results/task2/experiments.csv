@@ -1,4 +1,4 @@
 ﻿experiment,model,image_size,augment,learning_rate,fine_tune_lr,epochs,best_epoch,val_accuracy,val_macro_f1,test_accuracy,test_macro_f1,parameters_M,size_MB,latency_ms,throughput_img_s,train_minutes,sec_per_epoch
-cnn_no_aug,small_cnn,112,False,0.001,,15,12,0.8007,0.795,0.7792,0.7757,0.39,1.5,4.75,467.0,8.3,33.0
-cnn_aug,small_cnn,112,True,0.001,,15,14,0.7422,0.7374,0.7682,0.7658,0.39,1.5,3.87,365.7,10.8,43.0
-mobilenet_transfer,mobilenet_v3,160,True,0.001,0.001,8,8,0.9543,0.9526,0.9453,0.9446,4.208,16.24,16.56,289.5,9.1,68.0
+cnn_no_aug,small_cnn,112,False,0.001,,15,12,0.8007,0.795,0.7792,0.7757,0.39,1.5,3.85,355.5,10.8,43.1
+cnn_aug,small_cnn,112,True,0.001,,15,14,0.7422,0.7374,0.7682,0.7658,0.39,1.5,2.71,315.8,11.8,47.0
+mobilenet_transfer,mobilenet_v3,160,True,0.001,0.001,8,8,0.9543,0.9526,0.9453,0.9446,4.208,16.24,18.01,249.1,9.6,72.2

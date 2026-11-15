@@ -1,0 +1,115 @@
+{
+  "rows": [
+    {
+      "model": "majority class (dummy)",
+      "features": "none (ignores the image)",
+      "chosen_params": "{}",
+      "val_macro_f1": 0.0787,
+      "test_accuracy": 0.2445,
+      "test_macro_f1": 0.0786,
+      "fit_seconds": 0.02,
+      "latency_ms": 0.0,
+      "size_MB": 0.0
+    },
+    {
+      "model": "random by class share (dummy)",
+      "features": "none (ignores the image)",
+      "chosen_params": "{}",
+      "val_macro_f1": 0.2124,
+      "test_accuracy": 0.1825,
+      "test_macro_f1": 0.1742,
+      "fit_seconds": 0.0,
+      "latency_ms": 0.0,
+      "size_MB": 0.0
+    },
+    {
+      "model": "k-NN",
+      "features": "hand-crafted (colour+HOG+LBP)",
+      "chosen_params": "{'n_neighbors': 5}",
+      "val_macro_f1": 0.434,
+      "test_accuracy": 0.4599,
+      "test_macro_f1": 0.4063,
+      "fit_seconds": 0.42,
+      "latency_ms": 3.65,
+      "size_MB": 22.25
+    },
+    {
+      "model": "logistic regression",
+      "features": "hand-crafted (colour+HOG+LBP)",
+      "chosen_params": "{'C': 0.01}",
+      "val_macro_f1": 0.6475,
+      "test_accuracy": 0.6624,
+      "test_macro_f1": 0.6585,
+      "fit_seconds": 7.97,
+      "latency_ms": 3.49,
+      "size_MB": 0.1
+    },
+    {
+      "model": "logistic regression",
+      "features": "ImageNet MobileNetV3 features (frozen)",
+      "chosen_params": "{'C': 0.1}",
+      "val_macro_f1": 0.9325,
+      "test_accuracy": 0.9252,
+      "test_macro_f1": 0.9241,
+      "fit_seconds": 1.99,
+      "latency_ms": 17.69,
+      "size_MB": 0.05
+    },
+    {
+      "model": "SVM (RBF kernel)",
+      "features": "hand-crafted (colour+HOG+LBP)",
+      "chosen_params": "{'C': 10.0}",
+      "val_macro_f1": 0.6973,
+      "test_accuracy": 0.6934,
+      "test_macro_f1": 0.6908,
+      "fit_seconds": 18.43,
+      "latency_ms": 11.5,
+      "size_MB": 42.09
+    },
+    {
+      "model": "SVM (RBF kernel)",
+      "features": "ImageNet MobileNetV3 features (frozen)",
+      "chosen_params": "{'C': 10.0}",
+      "val_macro_f1": 0.9272,
+      "test_accuracy": 0.9161,
+      "test_macro_f1": 0.9158,
+      "fit_seconds": 3.63,
+      "latency_ms": 20.46,
+      "size_MB": 15.49
+    },
+    {
+      "model": "random forest",
+      "features": "hand-crafted (colour+HOG+LBP)",
+      "chosen_params": "{'max_features': 0.05}",
+      "val_macro_f1": 0.721,
+      "test_accuracy": 0.7062,
+      "test_macro_f1": 0.7041,
+      "fit_seconds": 14.74,
+      "latency_ms": 3.78,
+      "size_MB": 21.49
+    }
+  ],
+  "importance_model": "random forest",
+  "importance": {
+    "colour (HSV histogram)": {
+      "f1_drop": 0.3888633859268701,
+      "std": 0.003721638619456092
+    },
+    "shape (HOG)": {
+      "f1_drop": 0.047392356289510974,
+      "std": 0.002206932528876103
+    },
+    "texture (LBP)": {
+      "f1_drop": 0.14804770343991716,
+      "std": 0.012947180992161949
+    }
+  },
+  "feature_latency_ms": {
+    "handcrafted": 3.45,
+    "deep_frozen": 17.67
+  },
+  "feature_seconds_per_image": {
+    "handcrafted": 0.2547059599545083,
+    "deep_frozen": 0.0272989168437929
+  }
+}

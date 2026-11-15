@@ -4,7 +4,7 @@ Flow:  run_explanations(cfg)
          -> [2.10a] grad_cam                 where in the image the CNN looks for its decision
          -> [2.10b] deletion_test            is that explanation faithful? (masking the hot pixels must hurt)
          -> [2.10c] calibration_report       are the confidence scores trustworthy? (reliability, ECE)
-         -> [2.10d] embedding_separation     how well each representation separates the classes (silhouette, t-SNE)
+         -> [2.10d] embedding_separation     how well each representation separates the classes (5-NN accuracy, silhouette, t-SNE)
        writes results/task2/xai_*.png and xai.json
 """
 from pathlib import Path
@@ -157,26 +157,32 @@ def penultimate_features(model, paths, image_size, batch_size=64):
 
 
 def embedding_separation(features, labels, seed=0):
-    """[2.10d] How well a representation separates the classes: silhouette score + 2-D t-SNE map.
+    """[2.10d] How well a representation separates the classes: 5-NN accuracy, silhouette score, 2-D t-SNE map.
 
-    Method:   standardise -> silhouette (cosine) of the true labels: +1 = tight, separate class clusters, 0 = mixed;
-              t-SNE (perplexity 30) only for the picture (distances in t-SNE are not meaningful).
+    Method:   5-NN accuracy (cosine distance, 5-fold cross-validation): share of images whose nearest neighbours
+              carry the same class -> 1 = classes form clean neighbourhoods, 1/n_classes = mixed. Robust in high
+              dimensions, so it is the main number.
+              Silhouette (cosine) of the true labels: +1 = tight, separate clusters, 0 = overlapping. Strict in high
+              dimensions (values around 0.2 are already good there), so it is reported as a second view.
+              t-SNE (perplexity 30) of the L2-normalised features, only for the picture (t-SNE distances are not meaningful).
 
     Inputs:
         features: (N, D) array.
         labels:   (N,) integer labels.
 
     Returns:
-        (silhouette: float, points_2d: np.ndarray (N, 2))
+        (knn_accuracy: float, silhouette: float, points_2d: np.ndarray (N, 2))
     """
     from sklearn.manifold import TSNE
     from sklearn.metrics import silhouette_score
-    from sklearn.preprocessing import StandardScaler
+    from sklearn.model_selection import cross_val_score
+    from sklearn.neighbors import KNeighborsClassifier
+    from sklearn.preprocessing import normalize
 
-    scaled = StandardScaler().fit_transform(features)
-    score = float(silhouette_score(scaled, labels, metric="cosine"))
-    points = TSNE(n_components=2, perplexity=30, init="pca", random_state=seed).fit_transform(scaled)
-    return score, points
+    knn = float(cross_val_score(KNeighborsClassifier(5, metric="cosine"), features, labels, cv=5).mean())
+    score = float(silhouette_score(features, labels, metric="cosine"))
+    points = TSNE(n_components=2, perplexity=30, init="pca", random_state=seed).fit_transform(normalize(features))
+    return knn, score, points
 
 
 # ---------------------------------------------------------------------------------------------------------- [2.10.R]
@@ -284,7 +290,7 @@ def run_explanations(cfg, n_deletion=60, seed=0):
         info["accuracy"] = float((predicted == labels).mean())
         # [2.10d] learned representation
         features = penultimate_features(model, paths, meta["image_size"])
-        info["silhouette"], points = embedding_separation(features, labels, seed)
+        info["knn_accuracy"], info["silhouette"], points = embedding_separation(features, labels, seed)
         info["tsne"] = points.tolist()
         results["models"][name] = info
 
@@ -294,11 +300,11 @@ def run_explanations(cfg, n_deletion=60, seed=0):
         data = np.load(cache, allow_pickle=True)
         n_test = len(test)
         hand = data["handcrafted"][-n_test:]
-        score, points = embedding_separation(hand, labels, seed)
-        results["handcrafted"] = {"silhouette": score, "tsne": points.tolist()}
+        knn, score, points = embedding_separation(hand, labels, seed)
+        results["handcrafted"] = {"knn_accuracy": knn, "silhouette": score, "tsne": points.tolist()}
         deep = data["deep"][-n_test:]
-        score, points = embedding_separation(deep, labels, seed)
-        results["imagenet_frozen"] = {"silhouette": score, "tsne": points.tolist()}
+        knn, score, points = embedding_separation(deep, labels, seed)
+        results["imagenet_frozen"] = {"knn_accuracy": knn, "silhouette": score, "tsne": points.tolist()}
 
     # figures: deletion curves, reliability diagrams, t-SNE maps
     fig, axes = plt.subplots(1, len(models), figsize=(4.2 * len(models), 3.4), constrained_layout=True, squeeze=False)
@@ -327,11 +333,11 @@ def run_explanations(cfg, n_deletion=60, seed=0):
     fig.suptitle("[2.10c] Reliability diagrams (bars on the diagonal = trustworthy scores)", fontsize=11)
     save(fig, "xai_calibration.png")
 
-    maps = [(f"hand-crafted features\nsilhouette {results['handcrafted']['silhouette']:.3f}", results["handcrafted"]["tsne"])] \
+    maps = [(f"hand-crafted features\n5-NN acc {results['handcrafted']['knn_accuracy']:.2f}, silhouette {results['handcrafted']['silhouette']:.2f}", results["handcrafted"]["tsne"])] \
         if "handcrafted" in results else []
-    maps += [(f"ImageNet MobileNetV3 (frozen)\nsilhouette {results['imagenet_frozen']['silhouette']:.3f}",
+    maps += [(f"ImageNet MobileNetV3 (frozen)\n5-NN acc {results['imagenet_frozen']['knn_accuracy']:.2f}, silhouette {results['imagenet_frozen']['silhouette']:.2f}",
               results["imagenet_frozen"]["tsne"])] if "imagenet_frozen" in results else []
-    maps += [(f"{name} (trained)\nsilhouette {info['silhouette']:.3f}", info["tsne"]) for name, info in results["models"].items()]
+    maps += [(f"{name} (trained)\n5-NN acc {info['knn_accuracy']:.2f}, silhouette {info['silhouette']:.2f}", info["tsne"]) for name, info in results["models"].items()]
     fig, axes = plt.subplots(1, len(maps), figsize=(3.6 * len(maps), 3.8), constrained_layout=True, squeeze=False)
     for ax, (title, points) in zip(axes[0], maps):
         points = np.asarray(points)
