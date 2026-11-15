@@ -8,5 +8,5 @@ pillow>=10.0
 torch>=2.1
 torchvision>=0.16
 timm>=0.9
-streamlit>=1.30
+streamlit>=1.50          # demo_app.py uses st.navigation(position="top") and st.segmented_control
 pytest>=7.0
