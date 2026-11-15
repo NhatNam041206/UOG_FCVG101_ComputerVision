@@ -42,7 +42,7 @@ function and see straight away where it sits in the flow, what goes in, what com
 | --- | --- | --- | --- |
 | 1. Core functions | `src/*.py` | One algorithm step: arrays in, arrays/results out | Read config, touch files, plot, print |
 | 2. Task runners | `run_task1a()`, `run_task1b()`, `run_task2()` | Chain core steps in order, save results | Contain algorithm maths |
-| 3. Entry points | notebook, `app.py` | Call runners or `assistant.run_mode()`, show results | Contain algorithm code |
+| 3. Entry points | notebook, `app.py`, `demo_app.py` + `demo/` | Call runners, `src/` functions or `assistant.run_mode()`, show results | Contain algorithm code |
 
 So when you read the notebook or the app, every call goes **down** one layer, and every algorithm lives in exactly
 one place in `src/`.
@@ -73,24 +73,33 @@ FCVG101-Coursework/
     train.py                  [2]    train_model(), run_task2()
     evaluate.py               [2]    metrics, confusion matrix
     inference.py              [2→3]  load_model(), predict()
+    baselines.py              [2]    classical baselines (hand-crafted / frozen ImageNet features)
+    explain.py                [2]    Grad-CAM, deletion test, embedding analysis
     assistant.py              [3]    MODES table, run_mode()
     visualize.py              [VIS]  all plotting (figures for notebook and app)
   notebooks/
     FCVG101_Coursework.ipynb  one section per task, calls runners, shows figures
   app.py                      Streamlit UI, calls assistant.run_mode() only
+  demo_app.py                 Streamlit visual demo of every step (Task 1A, 1B, 2); one page per task
+  demo/                       demo pages (page_*.py) + common.py helpers; display only, algorithms stay in src/
   data/
     calibration/              your real checkerboard photos (same camera, same resolution)
     samples/                  test images for Task 1B (noisy, image pairs)
-    raw/                      Task 2 dataset as downloaded, never edited
+    raw/                      Task 2 dataset as downloaded, never edited (not in git; run_task2 downloads it)
     splits/                   generated train/ val/ test/
   artifacts/                  outputs other tasks load: calibration.npz, model.pth, classes.json
   results/
     task1a/  task1b/  task2/  figures, CSVs and metrics.json used in the report
   tests/                      small checks that each core function returns the right shape/type
+  tools/task1a/               your original Task 1A capture/undistort scripts, unchanged
+  exports/                    notebook exported to HTML (with outputs)
+  report/                     report.md + build_report.py -> FCVG101_Coursework_Report.docx
 ```
 
 Your existing Task 1A scripts (`calibration_task1a.py`, `capture_checker_task1a.py`, `undistort_view_task1a.py`)
-stay in `Cousework/` unchanged. `capture_checker_task1a.py` remains the tool for taking photos. `src/calibration.py`
+are copied unchanged into `tools/task1a/` (originals stay in `Cousework/`). `capture_checker_task1a.py` remains the
+tool for taking photos: `run_task1a(cfg, source="camera")` runs it for the live option, `source="upload"` uses photo
+files, and `view_undistorted()` runs `undistort_view_task1a.py` for the live before/after window. `src/calibration.py`
 holds the same calibration steps as importable functions, and its output (`artifacts/calibration.npz`) uses the
 same keys (`K`, `dist`, `width`, `height`), so `undistort_view_task1a.py` can still read it.
 
@@ -196,13 +205,15 @@ This is the map of the whole flow. Each row is one function.
 
 | ID | Function | Input | Output | Purpose |
 | --- | --- | --- | --- | --- |
+| 1A.0 | `collect_calibration_images(cfg, source, uploads)` | "upload" (files) or "camera" (live capture tool) | folder of photos | Get the photos from one of two sources |
 | 1A.1 | `load_calibration_images(folder)` | folder path | list of (name, BGR image) | Read photos, reject unreadable or mixed-size ones |
 | 1A.2 | `detect_corners(gray, pattern_size)` | grayscale, (cols, rows) inner corners | `found`, corners (N,1,2) | Find the board grid, refine to sub-pixel |
 | 1A.3 | `calibrate_camera(obj_pts, img_pts, size, fix_k3)` | 3D/2D point lists, image size | `CalibrationResult` | Estimate K and distortion |
 | 1A.4 | `compute_reprojection_errors(result, obj_pts, img_pts)` | calibration, point lists | per-view mean/RMS error (px) | Measure fit quality |
 | 1A.5 | `undistort_image(bgr, K, dist, alpha)` | image, K, dist | undistorted image | Remove lens distortion |
 | 1A.6 | `save_calibration(result, path)` | result, path | `calibration.npz` | Hand K and dist to Task 3 |
-| 1A.R | `run_task1a(cfg)` | config | `Task1AReport` + files in results/task1a | Run 1A.1–1A.6 in order |
+| 1A.7 | `view_undistorted(cfg, source, image_path)` | camera or one photo | live window | BEFORE / AFTER with undistort_view_task1a.py |
+| 1A.R | `run_task1a(cfg, source, uploads)` | config, source | `Task1AReport` + files in results/task1a | Run 1A.0–1A.6 in order |
 
 ### Task 1B – Classical processing (rubric 1.2, 1.3)
 
